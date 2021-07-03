@@ -1,13 +1,9 @@
 package model
 
-import (
-	"gorm.io/gorm"
-)
-
 type Table struct {
-	gorm.Model
 	ID           uint
-	Guests       []Guest
+	Guests       []Guest `gorm:"foreignKey:TableID"  json:"guest"`
 	Capacity     int
-	SizeOfGuests int
+	Sizeofguests int
+	Emptyseats   int
 }

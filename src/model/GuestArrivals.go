@@ -3,13 +3,12 @@ package model
 import (
 	"time"
 
-	"gorm.io/gorm"
+	"github.com/jinzhu/gorm"
 )
 
 type GuestArrivals struct {
 	gorm.Model
-	ID           uint
-	ArrivedGuest Guest
-	GuestID      uint
+
+	ArrivedGuest Guest `gorm:"foreignKey:GuestArrivalID"`
 	ArrivalTime  time.Time
 }
