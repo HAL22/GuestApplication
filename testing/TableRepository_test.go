@@ -27,7 +27,7 @@ var _ = Describe("Table Repository test", func() {
 
 		})
 		It("table exists", func() {
-			table := model.Table{ID: 12, Guests: make([]model.Guest, 0, 15), Capacity: 15, Sizeofguests: 0, Emptyseats: 15}
+			table := model.Table{ID: 12, Capacity: 15, Sizeofguests: 0, Emptyseats: 15}
 			DB.Create(&table)
 			bool_answer, table_answer := tableRepo.DoesTableExist(int(table.ID))
 
