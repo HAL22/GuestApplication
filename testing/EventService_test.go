@@ -1,6 +1,8 @@
 package testing
 
 import (
+	"os"
+
 	"github.com/GG_Backend_tech_challenge/src/mocks"
 	"github.com/GG_Backend_tech_challenge/src/model"
 	"github.com/GG_Backend_tech_challenge/src/repository"
@@ -12,6 +14,11 @@ import (
 )
 
 var _ = Describe("Service Test", func() {
+	os.Setenv("USER", "root")
+	os.Setenv("PASSWORD", "turing221997")
+	os.Setenv("IP_ADDRESS", "localhost")
+	os.Setenv("DB_NAME", "event")
+	os.Setenv("PORT_NUM", "3306")
 	var (
 		ctrl              *gomock.Controller
 		tableRepo         *mocks.MockTableRepository
@@ -24,7 +31,7 @@ var _ = Describe("Service Test", func() {
 			ctrl = gomock.NewController(GinkgoT())
 			tableRepo = mocks.NewMockTableRepository(ctrl)
 			guestRepo = mocks.NewMockGuestRepository(ctrl)
-			DB = repository.GetDataBaseConnectionWithTablesAndData("root", "turing221997", "localhost", 3306, "event")
+			DB = repository.GetDataBaseConnectionWithTablesAndData(os.Getenv("USER"), os.Getenv("PASSWORD"), os.Getenv("IP_ADDRESS"), os.Getenv("PORT_NUM"), os.Getenv("DB_NAME"))
 		})
 		It("Can add guests", func() {
 			name := "Tim"
@@ -66,7 +73,7 @@ var _ = Describe("Service Test", func() {
 			ctrl = gomock.NewController(GinkgoT())
 			tableRepo = mocks.NewMockTableRepository(ctrl)
 			guestRepo = mocks.NewMockGuestRepository(ctrl)
-			DB = repository.GetDataBaseConnectionWithTablesAndData("root", "turing221997", "localhost", 3306, "event")
+			DB = repository.GetDataBaseConnectionWithTablesAndData(os.Getenv("USER"), os.Getenv("PASSWORD"), os.Getenv("IP_ADDRESS"), os.Getenv("PORT_NUM"), os.Getenv("DB_NAME"))
 		})
 		It("Gets guests", func() {
 			guests := []model.Guest{{Name: "Tim"}, {Name: "Peter"}, {Name: "Rummy"}}
@@ -87,7 +94,7 @@ var _ = Describe("Service Test", func() {
 			tableRepo = mocks.NewMockTableRepository(ctrl)
 			guestRepo = mocks.NewMockGuestRepository(ctrl)
 			guestArrivalsRepo = mocks.NewMockGuestArrivalsRepository(ctrl)
-			DB = repository.GetDataBaseConnectionWithTablesAndData("root", "turing221997", "localhost", 3306, "event")
+			DB = repository.GetDataBaseConnectionWithTablesAndData(os.Getenv("USER"), os.Getenv("PASSWORD"), os.Getenv("IP_ADDRESS"), os.Getenv("PORT_NUM"), os.Getenv("DB_NAME"))
 		})
 		It("Can add guest to arrival guests 1", func() {
 			name := "Tim"
@@ -149,7 +156,7 @@ var _ = Describe("Service Test", func() {
 			ctrl = gomock.NewController(GinkgoT())
 			tableRepo = mocks.NewMockTableRepository(ctrl)
 			guestRepo = mocks.NewMockGuestRepository(ctrl)
-			DB = repository.GetDataBaseConnectionWithTablesAndData("root", "turing221997", "localhost", 3306, "event")
+			DB = repository.GetDataBaseConnectionWithTablesAndData(os.Getenv("USER"), os.Getenv("PASSWORD"), os.Getenv("IP_ADDRESS"), os.Getenv("PORT_NUM"), os.Getenv("DB_NAME"))
 		})
 		It("Deleting", func() {
 			name := "Tim"
@@ -172,7 +179,7 @@ var _ = Describe("Service Test", func() {
 			ctrl = gomock.NewController(GinkgoT())
 			tableRepo = mocks.NewMockTableRepository(ctrl)
 			guestRepo = mocks.NewMockGuestRepository(ctrl)
-			DB = repository.GetDataBaseConnectionWithTablesAndData("root", "turing221997", "localhost", 3306, "event")
+			DB = repository.GetDataBaseConnectionWithTablesAndData(os.Getenv("USER"), os.Getenv("PASSWORD"), os.Getenv("IP_ADDRESS"), os.Getenv("PORT_NUM"), os.Getenv("DB_NAME"))
 		})
 		It("Gets arrived guests", func() {
 			arrived_guests := []model.GuestArrivals{{Name: "Tim"}, {Name: "Peter"}, {Name: "Rummy"}}
@@ -191,7 +198,7 @@ var _ = Describe("Service Test", func() {
 			ctrl = gomock.NewController(GinkgoT())
 			tableRepo = mocks.NewMockTableRepository(ctrl)
 			guestRepo = mocks.NewMockGuestRepository(ctrl)
-			DB = repository.GetDataBaseConnectionWithTablesAndData("root", "turing221997", "localhost", 3306, "event")
+			DB = repository.GetDataBaseConnectionWithTablesAndData(os.Getenv("USER"), os.Getenv("PASSWORD"), os.Getenv("IP_ADDRESS"), os.Getenv("PORT_NUM"), os.Getenv("DB_NAME"))
 		})
 		It("Seats", func() {
 			tableRepo.EXPECT().GetEmptySeats().Return(3)

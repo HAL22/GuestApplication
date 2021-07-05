@@ -19,7 +19,7 @@ type TableRepo struct {
 	DB *gorm.DB
 }
 
-func (t *TableRepo) AddTable(capacity int, tableID int) bool {
+func (t *TableRepo) AddTable(tableID int, capacity int) bool {
 	table := model.Table{
 		ID:       uint(tableID),
 		Capacity: capacity, Sizeofguests: 0,

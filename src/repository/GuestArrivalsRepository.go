@@ -25,6 +25,15 @@ func (g *GuestArrivalsRepo) AddArrivedGuest(guest model.Guest, time time.Time) b
 		ArrivalTime:        time,
 		GuestID:            guest.ID,
 	}
+
+	var guestArrival model.GuestArrivals
+
+	g.DB.Where("guest_id = ?", arrivedguest.GuestID).First(&guestArrival)
+
+	if guestArrival.GuestID != 0 {
+		return false
+	}
+
 	result := g.DB.Create(&arrivedguest)
 	if result.Error == nil {
 		return true

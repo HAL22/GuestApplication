@@ -17,6 +17,8 @@ func NewRouter(eventHandler EventHandler) *mux.Router {
 
 	r.HandleFunc("/seats_empty", eventHandler.GetEmptySeats).Methods("GET")
 
+	r.HandleFunc("/table", eventHandler.AddTable).Methods("POST")
+
 	return r
 
 }

@@ -1,6 +1,8 @@
 package testing
 
 import (
+	"os"
+
 	"github.com/GG_Backend_tech_challenge/src/model"
 	"github.com/GG_Backend_tech_challenge/src/repository"
 	"github.com/jinzhu/gorm"
@@ -9,14 +11,19 @@ import (
 )
 
 var _ = Describe("Guest Repository Test", func() {
+	os.Setenv("USER", "root")
+	os.Setenv("PASSWORD", "turing221997")
+	os.Setenv("IP_ADDRESS", "localhost")
+	os.Setenv("DB_NAME", "event")
+	os.Setenv("PORT_NUM", "3306")
 	var (
 		DB        *gorm.DB
 		guestRepo repository.GuestRepo
-		user      string = "root"
-		password  string = "turing221997"
-		host      string = "localhost"
-		port      int    = 3306
-		db        string = "event"
+		user      string = os.Getenv("USER")
+		password  string = os.Getenv("PASSWORD")
+		host      string = os.Getenv("IP_ADDRESS")
+		port      string = os.Getenv("PORT_NUM")
+		db        string = os.Getenv("DB_NAME")
 	)
 	Context("testing GetGuestByName", func() {
 		BeforeEach(func() {

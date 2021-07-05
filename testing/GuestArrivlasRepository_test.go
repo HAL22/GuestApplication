@@ -3,6 +3,8 @@ package testing
 import (
 	"time"
 
+	"os"
+
 	"github.com/GG_Backend_tech_challenge/src/model"
 	"github.com/GG_Backend_tech_challenge/src/repository"
 	"github.com/jinzhu/gorm"
@@ -11,14 +13,19 @@ import (
 )
 
 var _ = Describe("Guest Arrivals Repository Test", func() {
+	os.Setenv("USER", "root")
+	os.Setenv("PASSWORD", "turing221997")
+	os.Setenv("IP_ADDRESS", "localhost")
+	os.Setenv("DB_NAME", "event")
+	os.Setenv("PORT_NUM", "3306")
 	var (
 		DB                *gorm.DB
 		guestArrivalsRepo repository.GuestArrivalsRepo
-		user              string = "root"
-		password          string = "turing221997"
-		host              string = "localhost"
-		port              int    = 3306
-		db                string = "event"
+		user              string = os.Getenv("USER")
+		password          string = os.Getenv("PASSWORD")
+		host              string = os.Getenv("IP_ADDRESS")
+		port              string = os.Getenv("PORT_NUM")
+		db                string = os.Getenv("DB_NAME")
 	)
 	Context("testing AddArrivedGuest", func() {
 		BeforeEach(func() {
@@ -29,7 +36,7 @@ var _ = Describe("Guest Arrivals Repository Test", func() {
 		})
 		It("Adding arrived guest", func() {
 			var arrivedguest model.GuestArrivals
-			guest := model.Guest{ID: 0, Name: "Tim", AccompanyingGuests: 10, TableID: -1}
+			guest := model.Guest{ID: 2, Name: "Tim", AccompanyingGuests: 10, TableID: -1}
 			arrivetime := time.Now()
 			bool_answer := guestArrivalsRepo.AddArrivedGuest(guest, arrivetime)
 			DB.Where("name = ?", guest.Name).First(&arrivedguest)
@@ -46,7 +53,7 @@ var _ = Describe("Guest Arrivals Repository Test", func() {
 			}
 		})
 		It("Guest exist can be deleted", func() {
-			guest := model.Guest{ID: 0, Name: "Tim", AccompanyingGuests: 10, TableID: -1}
+			guest := model.Guest{ID: 2, Name: "Tim", AccompanyingGuests: 10, TableID: -1}
 			arrivetime := time.Now()
 			guestArrivalsRepo.AddArrivedGuest(guest, arrivetime)
 			bool_answer := guestArrivalsRepo.DeleteArrivedGuestByGuestName(guest.Name)

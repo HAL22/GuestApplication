@@ -9,8 +9,8 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-func GetDataBaseConnectionWithTables(MyUser string, Password string, Host string, Port int, Db string) *gorm.DB {
-	dsn := fmt.Sprintf("%s:%s@(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local", MyUser, Password, Host, Port, Db)
+func GetDataBaseConnectionWithTables(MyUser string, Password string, Host string, Port string, Db string) *gorm.DB {
+	dsn := fmt.Sprintf("%s:%s@(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", MyUser, Password, Host, Port, Db)
 	db, err := gorm.Open("mysql", dsn)
 	if err != nil {
 		log.Panic(err)
@@ -25,8 +25,9 @@ func GetDataBaseConnectionWithTables(MyUser string, Password string, Host string
 	return db
 }
 
-func GetDataBaseConnectionWithTablesAndData(MyUser string, Password string, Host string, Port int, Db string) *gorm.DB {
-	dsn := fmt.Sprintf("%s:%s@(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local", MyUser, Password, Host, Port, Db)
+func GetDataBaseConnectionWithTablesAndData(MyUser string, Password string, Host string, Port string, Db string) *gorm.DB {
+
+	dsn := fmt.Sprintf("%s:%s@(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", MyUser, Password, Host, Port, Db)
 	db, err := gorm.Open("mysql", dsn)
 	if err != nil {
 		log.Panic(err)
