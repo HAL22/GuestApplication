@@ -11,6 +11,7 @@ type TableRepository interface {
 	AssignTableToGuest(table model.Table, guest *model.Guest) (bool, int)
 	RemoveGuestFromTable(guest model.Guest, table model.Table) (bool, int)
 	IncreaseGuestSeats(table model.Table, increase int) (bool, int)
+	DecreaseGuestSeats(table model.Table, decrease int) (bool, int)
 	GetEmptySeats() int
 }
 
@@ -18,9 +19,9 @@ type TableRepo struct {
 	DB *gorm.DB
 }
 
-func (t *TableRepo) AddTable(capacity int, tableID uint) bool {
+func (t *TableRepo) AddTable(capacity int, tableID int) bool {
 	table := model.Table{
-		ID:       tableID,
+		ID:       uint(tableID),
 		Capacity: capacity, Sizeofguests: 0,
 		Emptyseats: capacity}
 
@@ -83,8 +84,24 @@ func (t *TableRepo) IncreaseGuestSeats(table model.Table, increase int) (bool, i
 
 }
 
+func (t *TableRepo) DecreaseGuestSeats(table model.Table, decrease int) (bool, int) {
+	if decrease <= 0 || table.Sizeofguests-decrease < 0 {
+		return false, 0
+	} else {
+		table.Emptyseats += decrease
+		table.Sizeofguests -= decrease
+		t.DB.Model(&model.Table{}).Where("id = ?", table.ID).Update("sizeofguests", table.Sizeofguests)
+		t.DB.Model(&model.Table{}).Where("id = ?", table.ID).Update("emptyseats", table.Emptyseats)
+		return true, table.Emptyseats
+	}
+}
+
 func (t *TableRepo) GetEmptySeats() int {
 	var sum int
 	t.DB.Table("tables").Select("sum(emptyseats)").Row().Scan(&sum)
 	return sum
+}
+
+func NewTableRepo(db *gorm.DB) TableRepository {
+	return &TableRepo{db}
 }

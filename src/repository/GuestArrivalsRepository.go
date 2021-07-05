@@ -62,3 +62,7 @@ func (g *GuestArrivalsRepo) GetArrivedGuests() (bool, []model.GuestArrivals) {
 		return false, arrivedguests
 	}
 }
+
+func NewGuestArrival(db *gorm.DB) GuestArrivalsRepository {
+	return &GuestArrivalsRepo{db}
+}

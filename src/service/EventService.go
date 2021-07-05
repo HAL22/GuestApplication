@@ -9,19 +9,20 @@ import (
 )
 
 type EventService interface {
-	AddGuestToGuestList(name string, tableID int, accompany_guests int, TableRepo repository.TableRepo, GuestRepo repository.GuestRepo) (bool, model.RespondByName)
-	GetGuests(GuestRepo repository.GuestRepo) (bool, model.RespondByGuests)
-	AddGuestToArrivedGuests(name string, accompany_guests int, TableRepo repository.TableRepo, GuestRepo repository.GuestRepo, GuestArrivalsRepo repository.GuestArrivalsRepo) (bool, model.RespondByName)
-	DeleteArrivedGuest(name string, TableRepo repository.TableRepo, GuestRepo repository.GuestRepo, GuestArrivalsRepo repository.GuestArrivalsRepo) bool
-	GetArrivedGuests(GuestArrivalsRepo repository.GuestArrivalsRepo) (bool, model.RespondByArrivedGuests)
-	GetEmptySeats(TableRepo repository.TableRepo) int
+	AddGuestToGuestList(name string, tableID int, accompany_guests int, TableRepo repository.TableRepository, GuestRepo repository.GuestRepository) (bool, model.RespondByName)
+	GetGuests(GuestRepo repository.GuestRepository) (bool, model.RespondByGuests)
+	AddGuestToArrivedGuests(name string, accompany_guests int, TableRepo repository.TableRepository, GuestRepo repository.GuestRepository, GuestArrivalsRepo repository.GuestArrivalsRepository) (bool, model.RespondByName)
+	DeleteArrivedGuest(name string, TableRepo repository.TableRepository, GuestRepo repository.GuestRepository, GuestArrivalsRepo repository.GuestArrivalsRepository) bool
+	GetArrivedGuests(GuestArrivalsRepo repository.GuestArrivalsRepository) (bool, model.RespondByArrivedGuests)
+	GetEmptySeats(TableRepo repository.TableRepository) model.RespondBySeats
+	AddTable(tableID int, capacity int, TableRepo repository.TableRepository) bool
 }
 
 type Eventservice struct {
 	DB *gorm.DB
 }
 
-func (e *Eventservice) AddGuestToGuestList(name string, tableID int, accompany_guests int, TableRepo repository.TableRepo, GuestRepo repository.GuestRepo) (bool, model.RespondByName) {
+func (e *Eventservice) AddGuestToGuestList(name string, tableID int, accompany_guests int, TableRepo repository.TableRepository, GuestRepo repository.GuestRepository) (bool, model.RespondByName) {
 	responseModel := model.RespondByName{Name: name}
 	ok_guest, guest := GuestRepo.GetGuestByName(name)
 	ok_table, table := TableRepo.DoesTableExist(tableID)
@@ -44,7 +45,7 @@ func (e *Eventservice) AddGuestToGuestList(name string, tableID int, accompany_g
 
 }
 
-func (e *Eventservice) GetGuests(GuestRepo repository.GuestRepo) (bool, model.RespondByGuests) {
+func (e *Eventservice) GetGuests(GuestRepo repository.GuestRepository) (bool, model.RespondByGuests) {
 	ok, guests := GuestRepo.GetGuests()
 	responseModel := model.RespondByGuests{
 		Guests: guests,
@@ -57,7 +58,7 @@ func (e *Eventservice) GetGuests(GuestRepo repository.GuestRepo) (bool, model.Re
 	}
 }
 
-func (e *Eventservice) AddGuestToArrivedGuests(name string, accompany_guests int, TableRepo repository.TableRepo, GuestRepo repository.GuestRepo, GuestArrivalsRepo repository.GuestArrivalsRepo) (bool, model.RespondByName) {
+func (e *Eventservice) AddGuestToArrivedGuests(name string, accompany_guests int, TableRepo repository.TableRepository, GuestRepo repository.GuestRepository, GuestArrivalsRepo repository.GuestArrivalsRepository) (bool, model.RespondByName) {
 	responseModel := model.RespondByName{Name: name}
 	ok_guest, guest := GuestRepo.GetGuestByName(name)
 	if !ok_guest {
@@ -84,6 +85,25 @@ func (e *Eventservice) AddGuestToArrivedGuests(name string, accompany_guests int
 
 		return ok_arrive, responseModel
 
+	} else if guest.AccompanyingGuests > accompany_guests {
+		decrease := (guest.AccompanyingGuests + 1) - (accompany_guests + 1)
+		ok_table, table := TableRepo.DoesTableExist(guest.TableID)
+
+		if !ok_table {
+			return false, responseModel
+		}
+
+		ok_table, _ = TableRepo.DecreaseGuestSeats(table, decrease)
+
+		if !ok_table {
+			return false, responseModel
+		}
+
+		guest.AccompanyingGuests -= decrease
+
+		ok_arrive := GuestArrivalsRepo.AddArrivedGuest(guest, time.Now())
+
+		return ok_arrive, responseModel
 	}
 
 	ok_table, _ := TableRepo.DoesTableExist(guest.TableID)
@@ -98,7 +118,7 @@ func (e *Eventservice) AddGuestToArrivedGuests(name string, accompany_guests int
 
 }
 
-func (e *Eventservice) DeleteArrivedGuest(name string, TableRepo repository.TableRepo, GuestRepo repository.GuestRepo, GuestArrivalsRepo repository.GuestArrivalsRepo) bool {
+func (e *Eventservice) DeleteArrivedGuest(name string, TableRepo repository.TableRepository, GuestRepo repository.GuestRepository, GuestArrivalsRepo repository.GuestArrivalsRepository) bool {
 	ok_guest, guest := GuestRepo.GetGuestByName(name)
 	if !ok_guest {
 		return false
@@ -122,7 +142,7 @@ func (e *Eventservice) DeleteArrivedGuest(name string, TableRepo repository.Tabl
 
 }
 
-func (e *Eventservice) GetArrivedGuests(GuestArrivalsRepo repository.GuestArrivalsRepo) (bool, model.RespondByArrivedGuests) {
+func (e *Eventservice) GetArrivedGuests(GuestArrivalsRepo repository.GuestArrivalsRepository) (bool, model.RespondByArrivedGuests) {
 	ok, arrivedguests := GuestArrivalsRepo.GetArrivedGuests()
 
 	responseModel := model.RespondByArrivedGuests{Guests: arrivedguests}
@@ -130,6 +150,19 @@ func (e *Eventservice) GetArrivedGuests(GuestArrivalsRepo repository.GuestArriva
 	return ok, responseModel
 }
 
-func (e *Eventservice) GetEmptySeats(TableRepo repository.TableRepo) int {
-	return TableRepo.GetEmptySeats()
+func (e *Eventservice) GetEmptySeats(TableRepo repository.TableRepository) model.RespondBySeats {
+	seats := TableRepo.GetEmptySeats()
+	reponseModel := model.RespondBySeats{
+		SeatsEmpty: seats,
+	}
+	return reponseModel
+}
+
+func (e *Eventservice) AddTable(tableID int, capacity int, TableRepo repository.TableRepository) bool {
+	ok, _ := TableRepo.DoesTableExist(tableID)
+	if ok {
+		return false
+	} else {
+		return TableRepo.AddTable(tableID, capacity)
+	}
 }

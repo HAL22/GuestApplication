@@ -2,14 +2,12 @@ package model
 
 import (
 	"time"
-
-	"github.com/jinzhu/gorm"
 )
 
 type GuestArrivals struct {
-	gorm.Model
-	Name               string
-	AccompanyingGuests int
-	ArrivalTime        time.Time
-	GuestID            int
+	ID                 int       `gorm:"AUTO_INCREMENT" gorm:"column:id" json:"-"`
+	Name               string    `json:"name"`
+	AccompanyingGuests int       `json:"accompanying_guests"`
+	ArrivalTime        time.Time `json:"time_arrived"`
+	GuestID            int       `json:"-"`
 }

@@ -3,6 +3,7 @@ module github.com/GG_Backend_tech_challenge
 go 1.13
 
 require (
+	github.com/golang/mock v1.6.0
 	github.com/gorilla/mux v1.8.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/onsi/ginkgo v1.16.4

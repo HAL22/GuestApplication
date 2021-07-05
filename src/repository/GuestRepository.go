@@ -43,3 +43,7 @@ func (g *GuestRepo) GetGuests() (bool, []model.Guest) {
 		return false, guests
 	}
 }
+
+func NewGuestRepo(db *gorm.DB) GuestRepository {
+	return &GuestRepo{DB: db}
+}
