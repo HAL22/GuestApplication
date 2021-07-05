@@ -148,6 +148,50 @@ var _ = Describe("Table Repository test", func() {
 
 		})
 	})
+	Context("testing DecreaseGuestSeats", func() {
+		BeforeEach(func() {
+			DB = repository.GetDataBaseConnectionWithTablesAndData(user, password, host, port, db)
+			tableRepo = repository.TableRepo{
+				DB: DB,
+			}
+		})
+		It("Can decrease guest and increase empty seats", func() {
+			var table model.Table
+			var guest model.Guest
+			DB.Where("id = ?", 10).Find(&table)
+			guest = model.Guest{Name: "Tim", AccompanyingGuests: 3, TableID: -1}
+			tableRepo.AssignTableToGuest(table, &guest)
+			DB.Create(&guest)
+			DB.Where("id = ?", 10).Find(&table)
+			sizeofguests := table.Sizeofguests
+			empty_seats := table.Emptyseats
+			additionalGuests := 2
+			bool_answer, _ := tableRepo.DecreaseGuestSeats(table, additionalGuests)
+			DB.Where("id = ?", 10).Find(&table)
+
+			Expect(table.Emptyseats).To(Equal(empty_seats + additionalGuests))
+			Expect(table.Sizeofguests).To(Equal(sizeofguests - additionalGuests))
+			Expect(bool_answer).To(BeTrue())
+
+		})
+		It("Cannot decrease", func() {
+			var table model.Table
+			var guest model.Guest
+			DB.Where("id = ?", 10).Find(&table)
+			guest = model.Guest{Name: "Tim", AccompanyingGuests: 3, TableID: -1}
+			tableRepo.AssignTableToGuest(table, &guest)
+			DB.Create(&guest)
+			DB.Where("id = ?", 10).Find(&table)
+			sizeofguests := table.Sizeofguests
+			empty_seats := table.Emptyseats
+			additionalGuests := 5
+			bool_answer, _ := tableRepo.DecreaseGuestSeats(table, additionalGuests)
+			DB.Where("id = ?", 10).Find(&table)
+			Expect(table.Emptyseats).To(Equal(empty_seats))
+			Expect(table.Sizeofguests).To(Equal(sizeofguests))
+			Expect(bool_answer).To(BeFalse())
+		})
+	})
 	Context("testing GetEmptySeats", func() {
 		BeforeEach(func() {
 			DB = repository.GetDataBaseConnectionWithTablesAndData(user, password, host, port, db)
