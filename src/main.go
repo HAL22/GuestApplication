@@ -1,13 +1,21 @@
 package main
 
 import (
-	"fmt"
+	"net/http"
 
+	"github.com/GG_Backend_tech_challenge/src/handler"
 	"github.com/GG_Backend_tech_challenge/src/repository"
 )
 
 func main() {
 	db := repository.GetDataBaseConnectionWithTablesAndData("root", "turing221997", "localhost", 3306, "event")
-	fmt.Println("here")
-	db.Close()
+	defer db.Close()
+	eventHandler := handler.EventHandler{
+		DB: db,
+	}
+
+	router := handler.NewRouter(eventHandler)
+
+	http.ListenAndServe(":8001", router)
+
 }

@@ -1,13 +1,8 @@
 package model
 
-import (
-	"github.com/jinzhu/gorm"
-)
-
 type Guest struct {
-	gorm.Model
+	ID                 int `gorm:"AUTO_INCREMENT" gorm:"column:id" json:"id"`
 	Name               string
 	AccompanyingGuests int
 	TableID            int
-	GuestArrivalID     int
 }

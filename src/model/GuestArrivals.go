@@ -8,7 +8,8 @@ import (
 
 type GuestArrivals struct {
 	gorm.Model
-
-	ArrivedGuest Guest `gorm:"foreignKey:GuestArrivalID"`
-	ArrivalTime  time.Time
+	Name               string
+	AccompanyingGuests int
+	ArrivalTime        time.Time
+	GuestID            int
 }
